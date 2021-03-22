@@ -1,6 +1,8 @@
 .DS_Store
 node_modules
 /dist
+client_secret.json
+client_secret.js
 
 
 # local env files
