@@ -46,7 +46,7 @@
 
           <v-stepper-content step="3">
             <v-card class="mb-12 px-5 py-5" color="teal lighten-4">
-              Obrigado por testar o aplicativo! <br>
+              Obrigado por testar o aplicativo! <br />
               <a href="https://github.com/leandro-alvesc">Acesse meu GitHub!</a>
             </v-card>
 
@@ -90,7 +90,7 @@
         </v-expansion-panel>
         <v-expansion-panel>
           <v-expansion-panel-header> Gráfico </v-expansion-panel-header>
-          <v-expansion-panel-content>
+          <v-expansion-panel-content class="grafico">
             <GChart
               type="PieChart"
               :data="dataEmails"
@@ -99,6 +99,15 @@
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
+      <v-btn
+        v-on:click="updateEmails"
+        block
+        color="primary"
+        elevation="2"
+        role="button"
+      >
+        Atualizar
+      </v-btn>
     </div>
     <v-footer app>
       <v-btn
@@ -160,6 +169,10 @@
 #step {
   margin: 10rem;
 }
+
+.grafico {
+  height: auto;
+}
 </style>
 
 <script>
@@ -173,6 +186,7 @@ export default {
       step: 1,
       dialog: false,
       emails: '',
+      auth_code: '',
       dataEmails: [],
       chartOptions: {
         chart: {
@@ -193,12 +207,12 @@ export default {
       // eslint-disable-next-line
       if (authResult['code']) {
         axios
-          .post('http://127.0.0.1:5000/auth/google', {
+          .post('https://super-orgcontact-with-frontend.rj.r.appspot.com/auth/google', {
             // eslint-disable-next-line
-            code: `${authResult['code']}`, // eslint-disable-next-line
+            code: `${authResult['code']}`,
           })
-          .then((response) => {
-            this.emails = response.data; // eslint-disable-next-line
+          .then((resp) => {
+            this.emails = resp.data;
             localStorage.emails = JSON.stringify(this.emails);
             this.createDataEmails();
           })
@@ -240,8 +254,22 @@ export default {
     },
     revokeAccess() {
       this.GoogleAuth.disconnect();
-      localStorage.removeItem('emails');
-      this.emails = '';
+      axios
+        .post('https://super-orgcontact-with-frontend.rj.r.appspot.com/revoke/google', {
+          email: `${this.GoogleAuth.currentUser
+            .get()
+            .getBasicProfile()
+            .getEmail()}`,
+        })
+        .then((response) => {
+          console.log(response.data);
+          localStorage.removeItem('emails');
+          this.emails = '';
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        });
     },
     setSignInStatus() {
       this.user = this.GoogleAuth.currentUser.get();
@@ -255,6 +283,7 @@ export default {
         document.getElementById('signin-button').textContent = 'Sign In/Autorizar';
         document.getElementById('revoke-access').style.display = 'none';
         document.getElementById('painel-emails').style.display = 'none';
+        document.getElementById('step').style.display = 'block';
       }
     },
     updateSignInStatus() {
@@ -270,6 +299,26 @@ export default {
         dataEmails.push([email.dominio, email.emails.length]);
       }
       this.dataEmails = dataEmails;
+    },
+    updateEmails() {
+      axios
+        .post('https://super-orgcontact-with-frontend.rj.r.appspot.com/update/google', {
+          email: `${this.GoogleAuth.currentUser
+            .get()
+            .getBasicProfile()
+            .getEmail()}`,
+        })
+        .then((response) => {
+          if (response.data !== 'none') {
+            this.emails = response.data;
+            localStorage.emails = JSON.stringify(this.emails);
+            this.createDataEmails();
+          }
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.log(error);
+        });
     },
   },
   created() {
