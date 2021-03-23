@@ -5,5 +5,6 @@ Esse projeto foi feito para um desafio.
 ## Ferramentas utilizadas:
 - JavaScript
 - Vue.js
+- Vuetify
 - Node.js
 - Visual Studio Code
