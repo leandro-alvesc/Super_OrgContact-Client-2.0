@@ -167,7 +167,7 @@
 
 <style scoped>
 #step {
-  margin: 10rem;
+  margin: 10%;
 }
 
 .grafico {
