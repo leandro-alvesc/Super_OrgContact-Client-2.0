@@ -186,7 +186,6 @@ export default {
       step: 1,
       dialog: false,
       emails: '',
-      auth_code: '',
       dataEmails: [],
       chartOptions: {
         chart: {
