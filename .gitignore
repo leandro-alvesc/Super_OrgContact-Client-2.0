@@ -3,6 +3,7 @@ node_modules
 /dist
 client_secret.json
 client_secret.js
+.firebase
 
 
 # local env files
